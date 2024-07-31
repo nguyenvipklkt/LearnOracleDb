@@ -22,26 +22,42 @@ namespace AccountManagement.Repositories
 
         public OracleCommand CallStoredProcedure(string procedureName, IDictionary<string, object> parameters)
         {
-            var command = new OracleCommand(procedureName, _connection);
-            command.CommandType = CommandType.StoredProcedure;
-
-            foreach (var parameter in parameters)
+            _connection.Open();
+            if (_connection.State != ConnectionState.Open)
             {
-                if (parameter.Value is OracleParameter oracleParameter)
-                {
-                    command.Parameters.Add(oracleParameter);
-                }
-                else
-                {
-                    command.Parameters.Add(new OracleParameter(parameter.Key, parameter.Value));
-                }
+                throw new InvalidOperationException("Connection must be open for this operation.");
             }
 
-            dbContext.OpenConnection();
-            command.ExecuteNonQuery();
-            dbContext.CloseConnection();
-            return command;
+            using (var command = new OracleCommand(procedureName, _connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
 
+                foreach (var parameter in parameters)
+                {
+                    if (parameter.Value is OracleParameter oracleParameter)
+                    {
+                        command.Parameters.Add(oracleParameter);
+                    }
+                    else
+                    {
+                        command.Parameters.Add(new OracleParameter(parameter.Key, parameter.Value));
+                    }
+                }
+
+                try
+                {
+                    command.ExecuteNonQuery();
+                    _connection.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Exception when calling stored procedure: {ex.Message}");
+                    throw;
+                }
+
+                return command;
+            }
         }
+
     }
 }
