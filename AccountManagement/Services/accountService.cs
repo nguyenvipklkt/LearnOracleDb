@@ -110,5 +110,56 @@ namespace AccountManagement.Services
             }
         }
 
+        public object UpdateAccount(updateAccountRequest request)
+        {
+            string procedureName = "update_tk";
+            if (string.IsNullOrWhiteSpace(request.maTK) ||
+                string.IsNullOrWhiteSpace(request.tenDangNhap) || string.IsNullOrWhiteSpace(request.capBac))
+            {
+                return new
+                {
+                    messeage = "Missing parameters.",
+                };
+            }
+
+            try
+            {
+                var output = new OracleParameter("P-EXISTS", OracleDbType.Int32, ParameterDirection.Output);
+                var parameters = new Dictionary<string, object>
+        {
+            { "P_MATK", request.maTK },
+            { "P_CAPBAC", request.capBac },
+            { "P_TENDANGNHAP", request.tenDangNhap },
+            { "P-EXISTS", output }
+        };
+
+                using (var command = _accountRepository.CallStoredProcedure(procedureName, parameters))
+                {
+                    var existsDecimal = (OracleDecimal)output.Value;
+                    int exists = existsDecimal.IsNull ? 0 : existsDecimal.ToInt32();
+
+                    if (exists == 0)
+                    {
+                        return new
+                        {
+                            messeage = "Account does not exists.",
+                        };
+                    }
+                }
+
+                return new
+                {
+                    message = "Create successful",
+                };
+            }
+            catch (Exception ex)
+            {
+                return new
+                {
+                    message = ex.Message,
+                };
+            }
+        }
+
     }
 }

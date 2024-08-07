@@ -31,6 +31,26 @@ namespace AccountManagement.Controllers
             }
         }
 
+        [HttpPost("update-account")]
+        public object UdateUser([FromBody] updateAccountRequest request)
+        {
+            try
+            {
+                var definition = _accountService.UpdateAccount(request);
+                return new
+                {
+                    Data = definition
+                };
+            }
+            catch (Exception ex)
+            {
+                return new
+                {
+                    message = ex.Message,
+                };
+            }
+        }
+
         [HttpGet("get-account")]
         public object GetUser(string maTk)
         {
