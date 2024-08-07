@@ -20,13 +20,32 @@ namespace AccountManagement.Controllers
                 var definition = _accountService.CreateAccount(request);
                 return new
                 {
-                    ProcedureName = request.procedureName,
                     Data = definition
                 };
             }
             catch (Exception ex)
             {
                 return new {
+                    message = ex.Message,
+                };
+            }
+        }
+
+        [HttpGet("get-account")]
+        public object GetUser(string maTk)
+        {
+            try
+            {
+                var definition = _accountService.GetAccount(maTk);
+                return new
+                {
+                    Data = definition
+                };
+            }
+            catch (Exception ex)
+            {
+                return new
+                {
                     message = ex.Message,
                 };
             }

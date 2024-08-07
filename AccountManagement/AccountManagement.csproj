@@ -8,14 +8,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.18.151" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <Compile Remove="Commons\**" />
+    <Compile Remove="Utilities\**" />
+    <Content Remove="Commons\**" />
+    <Content Remove="Utilities\**" />
+    <EmbeddedResource Remove="Commons\**" />
+    <EmbeddedResource Remove="Utilities\**" />
+    <None Remove="Commons\**" />
+    <None Remove="Utilities\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Commons\" />
-    <Folder Include="Utilities\" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.18.151" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
 </Project>

@@ -12,7 +12,6 @@ builder.Services.AddScoped<OracleConnection>(provider =>
     return new OracleConnection(connectionString);
 });
 builder.Services.AddSingleton<DatabaseContext>();
-builder.Services.AddScoped<userService>();
 builder.Services.AddScoped<accountService>();
 builder.Services.AddScoped<BaseRepository>();
 builder.Services.AddScoped<AccountRepository>();

@@ -1,30 +1,29 @@
-﻿using AccountManagement.Repositories;
+﻿using AccountManagement.Database;
+using AccountManagement.Repositories;
 using AccountManagement.Requests;
 using Oracle.ManagedDataAccess.Client;
 using Oracle.ManagedDataAccess.Types;
 using System.Data;
+using System.Data.Common;
+using System.Reflection.PortableExecutable;
 
 namespace AccountManagement.Services
 {
     public class accountService
     {
         private readonly AccountRepository _accountRepository;
-        public accountService(AccountRepository accountRepository)
+        private readonly OracleConnection _connection;
+        public accountService(DatabaseContext databaseContext, OracleConnection connection)
         {
-            _accountRepository = accountRepository;
+            _accountRepository = new AccountRepository(databaseContext, connection);
+            _connection = connection;
         }
 
         public object CreateAccount(createAccountRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.procedureName))
-            {
-                return new
-                {
-                    messeage = "Procedure name does not exist.",
-                };
-            }
+            string procedureName = "tao_tk";
             if (string.IsNullOrWhiteSpace(request.maTK) || string.IsNullOrWhiteSpace(request.matKhau) ||
-                string.IsNullOrWhiteSpace(request.tenDangNhap) || string.IsNullOrWhiteSpace(request.capBac) || string.IsNullOrWhiteSpace(request.maKH))
+                string.IsNullOrWhiteSpace(request.tenDangNhap) || string.IsNullOrWhiteSpace(request.capBac))
             {
                 return new
                 {
@@ -38,14 +37,13 @@ namespace AccountManagement.Services
                 var parameters = new Dictionary<string, object>
         {
             { "P_MATK", request.maTK },
+            { "P_CAPBAC", request.capBac },
             { "P_TENDANGNHAP", request.tenDangNhap },
             { "P_MATKHAU", request.matKhau },
-            { "P_CAPBAC", request.capBac },
-            { "P_MAKH", request.maKH },
             { "P-EXISTS", output }
         };
 
-                using (var command = _accountRepository.CallStoredProcedure(request.procedureName, parameters))
+                using (var command = _accountRepository.CallStoredProcedure(procedureName, parameters))
                 {
                     var existsDecimal = (OracleDecimal)output.Value;
                     int exists = existsDecimal.IsNull ? 0 : existsDecimal.ToInt32();
@@ -54,7 +52,7 @@ namespace AccountManagement.Services
                     {
                         return new
                         {
-                            messeage = "Account rr customer already exists.",
+                            messeage = "Account already exists.",
                         };
                     }
                 }
@@ -62,7 +60,6 @@ namespace AccountManagement.Services
                 return new
                 {
                     message = "Create successful",
-                    result = output.Value
                 };
             }
             catch (Exception ex)
@@ -74,37 +71,35 @@ namespace AccountManagement.Services
             }
         }
 
-        public object GetAllAccounts(string procedureName)
+        public object GetAccount(string maTK)
         {
-            var accounts = new List<Account>();
-
             try
             {
-                var output = new OracleParameter("accounts", OracleDbType.RefCursor, ParameterDirection.Output);
-                var parameters = new Dictionary<string, object>
-        {
-            { "accounts", output }
-        };
-
-                using (var command = _accountRepository.CallStoredProcedure(procedureName, parameters))
+                var query = $"SELECT * FROM taikhoan where matk = '{maTK}'";
+                var res = _accountRepository.ExcuteQueryByReader(query);
+                using (var reader = (OracleDataReader)res)
                 {
-                    using (var reader = ((OracleRefCursor)command.Parameters["accounts"].Value).GetDataReader())
+
+                    if (reader.Read())
                     {
-                        while (reader.Read())
+                        var matk = reader.GetString(0);
+                        var capbac = reader.GetString(1);
+                        var tendangnhap = reader.GetString(2);
+                        _connection.Close();
+                        return new
                         {
-                            var account = new Account
-                            {
-                                maTK = reader["MAKH"].ToString(),
-                                capBac = reader["TENKH"].ToString(),
-                                tenDangNhap = reader["EMAIL"].ToString(),
-                                matKhau = reader["MATK"].ToString()
-                            };
-                            accounts.Add(account);
-                        }
+                            message = "Get success",
+                            account = new { matk, capbac, tendangnhap },
+                            Code = "Ok"
+                        };
                     }
                 }
-
-                return accounts;
+                _connection.Close();
+                return new
+                {
+                    message = "Create successful",
+                    result = res
+                };
             }
             catch (Exception ex)
             {
@@ -113,16 +108,6 @@ namespace AccountManagement.Services
                     message = ex.Message,
                 };
             }
-        }
-
-
-        public class Account
-        {
-            public string maTK { get; set; }
-            public string capBac { get; set; }
-            public string tenDangNhap { get; set; }
-            public string matKhau { get; set; }
-            public string maKH { get; set; }
         }
 
     }

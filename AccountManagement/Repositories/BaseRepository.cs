@@ -80,7 +80,6 @@ namespace AccountManagement.Repositories
         {
             try
             {
-
                 _connection.Open();
                 using (var command = new OracleCommand(query, _connection))
                 {
@@ -100,6 +99,7 @@ namespace AccountManagement.Repositories
             {
 
                 _connection.Open();
+
                 using (var command = new OracleCommand(query, _connection))
                 {
                     command.CommandType = System.Data.CommandType.Text;
@@ -118,6 +118,7 @@ namespace AccountManagement.Repositories
             {
 
                 _connection.Open();
+
                 using (var command = new OracleCommand(query, _connection))
                 {
                     command.CommandType = System.Data.CommandType.Text;
