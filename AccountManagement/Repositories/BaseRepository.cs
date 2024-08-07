@@ -47,7 +47,6 @@ namespace AccountManagement.Repositories
                 try
                 {
                     command.ExecuteNonQuery();
-                    _connection.Close();
                 }
                 catch (Exception ex)
                 {
@@ -56,6 +55,79 @@ namespace AccountManagement.Repositories
                 }
 
                 return command;
+            }
+        }
+
+        public object ExcuteQueryByScalar(string query)
+        {
+            try
+            {
+
+                _connection.Open();
+                using (var command = new OracleCommand(query, _connection))
+                {
+                    command.CommandType = System.Data.CommandType.Text;
+                    var result = command.ExecuteScalar();
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+        public object ExcuteQueryByReader(string query)
+        {
+            try
+            {
+
+                _connection.Open();
+                using (var command = new OracleCommand(query, _connection))
+                {
+                    command.CommandType = System.Data.CommandType.Text;
+                    var result = command.ExecuteReader();
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+        public object ExcuteQueryByNonQuery(string query)
+        {
+            try
+            {
+
+                _connection.Open();
+                using (var command = new OracleCommand(query, _connection))
+                {
+                    command.CommandType = System.Data.CommandType.Text;
+                    var result = command.ExecuteNonQuery();
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+        public object ExcuteQueryByStream(string query)
+        {
+            try
+            {
+
+                _connection.Open();
+                using (var command = new OracleCommand(query, _connection))
+                {
+                    command.CommandType = System.Data.CommandType.Text;
+                    var result = command.ExecuteStream();
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
             }
         }
 
