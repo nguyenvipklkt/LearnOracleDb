@@ -161,5 +161,12 @@ namespace AccountManagement.Services
             }
         }
 
+        public class Result
+        {
+            public int Code { get; set; }
+            public string Status { get; set; }
+            public object Data { get; set; }
+
+        }
     }
 }
