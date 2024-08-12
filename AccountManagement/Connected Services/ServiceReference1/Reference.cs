@@ -86,6 +86,9 @@ namespace ServiceReference1
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/GetAccountById", ReplyAction="http://tempuri.org/IService/GetAccountByIdResponse")]
         System.Threading.Tasks.Task<ServiceReference1.GetAccountByIdResponse> GetAccountByIdAsync(ServiceReference1.GetAccountByIdRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/CreateAccountById", ReplyAction="http://tempuri.org/IService/CreateAccountByIdResponse")]
+        System.Threading.Tasks.Task<ServiceReference1.CreateAccountByIdResponse> CreateAccountByIdAsync(ServiceReference1.CreateAccountByIdRequest request);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -123,6 +126,44 @@ namespace ServiceReference1
         public GetAccountByIdResponse(ServiceReference1.AccountDto GetAccountByIdResult)
         {
             this.GetAccountByIdResult = GetAccountByIdResult;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="CreateAccountById", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+    public partial class CreateAccountByIdRequest
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
+        public string matk;
+        
+        public CreateAccountByIdRequest()
+        {
+        }
+        
+        public CreateAccountByIdRequest(string matk)
+        {
+            this.matk = matk;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="CreateAccountByIdResponse", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+    public partial class CreateAccountByIdResponse
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
+        public bool CreateAccountByIdResult;
+        
+        public CreateAccountByIdResponse()
+        {
+        }
+        
+        public CreateAccountByIdResponse(bool CreateAccountByIdResult)
+        {
+            this.CreateAccountByIdResult = CreateAccountByIdResult;
         }
     }
     
@@ -179,6 +220,11 @@ namespace ServiceReference1
         public System.Threading.Tasks.Task<ServiceReference1.GetAccountByIdResponse> GetAccountByIdAsync(ServiceReference1.GetAccountByIdRequest request)
         {
             return base.Channel.GetAccountByIdAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<ServiceReference1.CreateAccountByIdResponse> CreateAccountByIdAsync(ServiceReference1.CreateAccountByIdRequest request)
+        {
+            return base.Channel.CreateAccountByIdAsync(request);
         }
         
         public virtual System.Threading.Tasks.Task OpenAsync()

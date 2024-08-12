@@ -1,33 +1,56 @@
 ﻿using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Configuration;
+using System.Data.Common;
 
-public class Service : Repos, IService
+
+public class Service : IService
 {
-    private readonly Repos _repos;
+    private string connectionString = ConfigurationManager.ConnectionStrings["TEST_DEV"].ConnectionString;
+    private readonly OracleConnection _connection;
     public Service()
     {
-        _repos = new Repos();
+        _connection = new OracleConnection(connectionString);
     }
+
+    public bool CreateAccountById(string matk)
+    {
+        try
+        {
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
+
     public AccountDto GetAccountById(string matk)
     {
         try
         {
             var query = "SELECT * FROM taikhoan where matk = " + "'" + matk + "'";
-            var res = _repos.ExcuteQueryByReader(query);
-            
-            AccountDto account = new AccountDto();
-            using (var reader = res)
+            _connection.Open();
+            using (var command = new OracleCommand(query, _connection))
             {
-                if (reader.Read())
+                command.CommandType = System.Data.CommandType.Text;
+                var result = command.ExecuteReader();
+                _connection.Close();    
+                AccountDto account = new AccountDto();
+                using (var reader = result)
                 {
-                    account.Matk = reader["matk"].ToString();
-                    account.Capbac = reader["capbac"].ToString();
-                    account.Tendangnhap = reader["tendangnhap"].ToString();
-                    account.Matkhau = reader["matkhau"].ToString();
+                    if (reader.Read())
+                    {
+                        account.Matk = reader["matk"].ToString();
+                        account.Capbac = reader["capbac"].ToString();
+                        account.Tendangnhap = reader["tendangnhap"].ToString();
+                        account.Matkhau = reader["matkhau"].ToString();
+                    }
+                    return account;
                 }
-                return account;
             }
+
+            
         }
         catch (Exception ex)
         {
